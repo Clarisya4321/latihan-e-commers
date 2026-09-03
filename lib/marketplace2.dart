@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -9,22 +10,60 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: const FlashSale(),
+      home: FlashSale(),
     );
   }
 }
 
-class FlashSale extends StatelessWidget {
+class FlashSale extends StatefulWidget {
   const FlashSale({super.key});
+
+  @override
+  State<FlashSale> createState() => _FlashSaleState();
+}
+
+class _FlashSaleState extends State<FlashSale> {
+  int detik = 8150;
+  Timer? timer;
+
+  @override
+  void initState() {
+    super.initState();
+
+    timer = Timer.periodic(const Duration(seconds: 1), (t) {
+      if (detik > 0) {
+        setState(() {
+          detik--;
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    timer?.cancel();
+    super.dispose();
+  }
+
+  String waktu() {
+    int jam = detik ~/ 3600;
+    int menit = (detik % 3600) ~/ 60;
+    int det = detik % 60;
+
+    return '${jam.toString().padLeft(2, '0')}:'
+        '${menit.toString().padLeft(2, '0')}:'
+        '${det.toString().padLeft(2, '0')}';
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(18),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -36,7 +75,13 @@ class FlashSale extends StatelessWidget {
                     children: [
                       Icon(Icons.arrow_back_ios, size: 18),
                       SizedBox(width: 5),
-                      Text('Flash Sale', style: TextStyle(fontSize: 18)),
+                      Text(
+                        'Flash Sale',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ],
                   ),
                   Row(
@@ -49,88 +94,112 @@ class FlashSale extends StatelessWidget {
                 ],
               ),
 
-              const SizedBox(height: 20),
+              const SizedBox(height: 15),
               const Divider(),
 
               // BANNER
               Container(
+                height: 155,
                 width: double.infinity,
-                height: 145,
                 padding: const EdgeInsets.all(18),
                 decoration: BoxDecoration(
-                  border: Border.all(),
-                  borderRadius: BorderRadius.circular(8),
+                  color: Colors.black,
+                  borderRadius: BorderRadius.circular(12),
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                child: Row(
                   children: [
-                    // ICON PETIR + JUDUL
-                    Row(
-                      children: const [
-                        Icon(Icons.flash_on, size: 22),
-                        SizedBox(width: 5),
-                        Text(
-                          'FLASH SALE 9.9',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Row(
+                            children: [
+                              Icon(
+                                Icons.flash_on,
+                                color: Colors.amber,
+                                size: 25,
+                              ),
+                              SizedBox(width: 5),
+                              Text(
+                                'FLASH SALE 9.9',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 19,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
                           ),
-                        ),
-                      ],
+
+                          const SizedBox(height: 12),
+
+                          const Text(
+                            'Berakhir dalam',
+                            style: TextStyle(color: Colors.white, fontSize: 13),
+                          ),
+
+                          const SizedBox(height: 5),
+
+                          Text(
+                            waktu(),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
 
-                    const SizedBox(height: 18),
-
-                    const Text(
-                      'Berakhir dalam 02:15:40',
-                      style: TextStyle(fontSize: 14),
-                    ),
-
-                    const Spacer(),
-
-                    const Align(
-                      alignment: Alignment.centerRight,
-                      child: Text(
-                        '2. Banner Promo',
-                        style: TextStyle(fontSize: 12),
+                    // GAMBAR BANNER
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: Image.network(
+                        'https://images.unsplash.com/photo-1607083206968-13611e3d76db?w=500',
+                        width: 130,
+                        height: 115,
+                        fit: BoxFit.cover,
                       ),
                     ),
                   ],
                 ),
               ),
 
-              const SizedBox(height: 25),
+              const SizedBox(height: 20),
 
-              // JUDUL PRODUK
+              // JUDUL
               const Text(
                 'Daftar Produk',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
 
-              const SizedBox(height: 15),
+              const SizedBox(height: 12),
 
               // PRODUK
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  produk(
-                    '50% OFF',
-                    'GAMBAR 1',
-                    'Sepatu Olahraga',
-                    'Rp 150.000',
-                    'Rp 75.000',
-                  ),
+              Expanded(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    produk(
+                      '50% OFF',
+                      'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500',
+                      'Sepatu Olahraga',
+                      'Rp 150.000',
+                      'Rp 75.000',
+                    ),
 
-                  const SizedBox(width: 15),
+                    const SizedBox(width: 12),
 
-                  produk(
-                    '30% OFF',
-                    'GAMBAR 2',
-                    'Raket Badminton',
-                    'Rp 300.000',
-                    'Rp 210.000',
-                  ),
-                ],
+                    produk(
+                      '30% OFF',
+                      'https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?w=500',
+                      'Raket Badminton',
+                      'Rp 300.000',
+                      'Rp 210.000',
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
@@ -139,7 +208,6 @@ class FlashSale extends StatelessWidget {
     );
   }
 
-  // KARTU PRODUK
   Widget produk(
     String diskon,
     String gambar,
@@ -149,52 +217,62 @@ class FlashSale extends StatelessWidget {
   ) {
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          border: Border.all(),
-          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: Colors.grey.shade300),
+          borderRadius: BorderRadius.circular(12),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // DISKON + FAVORITE
+            // DISKON
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  diskon,
-                  style: const TextStyle(fontWeight: FontWeight.bold),
+                Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: Colors.red,
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                  child: Text(
+                    diskon,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
-                const Icon(Icons.favorite_border, size: 20),
+                const Icon(Icons.favorite_border),
               ],
             ),
 
-            const SizedBox(height: 20),
+            const SizedBox(height: 10),
 
             // GAMBAR
-            Center(
-              child: Container(
-                height: 100,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey),
-                ),
-                child: Center(child: Text(gambar)),
-              ),
+            Image.network(
+              gambar,
+              height: 125,
+              width: double.infinity,
+              fit: BoxFit.contain,
             ),
 
-            const SizedBox(height: 15),
+            const SizedBox(height: 8),
 
             // NAMA
-            Text(nama, style: const TextStyle(fontWeight: FontWeight.w500)),
+            Text(
+              nama,
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+            ),
 
-            const SizedBox(height: 8),
+            const SizedBox(height: 5),
 
             // HARGA LAMA
             Text(
               hargaLama,
               style: const TextStyle(
-                color: Color.fromARGB(255, 203, 202, 202),
+                color: Colors.grey,
                 decoration: TextDecoration.lineThrough,
               ),
             ),
@@ -202,10 +280,14 @@ class FlashSale extends StatelessWidget {
             // HARGA BARU
             Text(
               harga,
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              style: const TextStyle(
+                color: Colors.red,
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
             ),
 
-            const SizedBox(height: 12),
+            const Spacer(),
 
             // TOMBOL
             SizedBox(
